@@ -74,11 +74,13 @@ namespace ConsoleUtils
             Console.WriteLine(GetUsage());
         }
 
-        public virtual void Process(string[] args, Action action)
+        public virtual void Process(string[] args, Action action, Action<ParserSettings> configuration = null)
         {
             try
             {
-                if (Parser.Default.ParseArguments(args, this))
+                Parser parser;
+                parser = configuration == null ? new Parser(s => s.CaseSensitive = true) : new Parser(configuration);
+                if (parser.ParseArguments(args, this))
                 {
                     if (DisplayHelp)
                     {
@@ -113,7 +115,7 @@ namespace ConsoleUtils
             }
         }
 
-        public virtual string GetUsage()
+        public virtual HelpText GetHelpText()
         {
             var text = HelpText.AutoBuild(this, (x) => { });
 
@@ -166,6 +168,11 @@ namespace ConsoleUtils
             text.AddDashesToOption = true;
 
             return text;
+        }
+
+        public virtual string GetUsage()
+        {
+            return GetHelpText();
         }
     }
 }
