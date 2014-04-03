@@ -33,7 +33,7 @@ namespace ConsoleUtils
         private readonly AssemblyMetaInfo assemblyInfo;
         private readonly HelpOptionFlag helpOptionFlags;
 
-        public string UndeterminedErrorMessage = "Sorry, something's wrong with the options.";
+        public string UndeterminedErrorMessage = "Sorry, something's wrong with the given options.";
         public string PreOptionsText = CRLF + "Options: ";
 
         /// <summary>
@@ -69,6 +69,9 @@ namespace ConsoleUtils
         [Option('h', "help", HelpText = "Display this screen.")]
         public virtual bool DisplayHelp { get; set; }
 
+        [ParserState]
+        public IParserState State { get; set; }
+
         public virtual void PrintHelp()
         {
             Console.WriteLine(GetUsage());
@@ -92,7 +95,8 @@ namespace ConsoleUtils
                 }
                 else
                 {
-                    ExtendedConsole.WriteErrorLine(CRLF + "Error: You've provided invalid options.");
+                    ExtendedConsole.WriteErrorLine(
+                        CRLF + "The provided options are incorrect. Details are given below.");
                     PrintHelp();
                 }
             }
@@ -106,7 +110,7 @@ namespace ConsoleUtils
         {
             if (ex.InnerException != null)
             {
-                ExtendedConsole.WriteErrorLine(CRLF + "Error: " + CRLF + CRLF + ex.InnerException.Message);
+                ExtendedConsole.WriteErrorLine(CRLF + "Error: " + ex.InnerException.Message);
             }
             else
             {
@@ -115,9 +119,36 @@ namespace ConsoleUtils
             }
         }
 
-        public virtual HelpText GetHelpText()
+        public virtual HelpText GetHelpTextBuilder()
         {
-            var text = HelpText.AutoBuild(this, (x) => { });
+            var help = new HelpText(new DefaultSentenceBuilder())
+                           {
+                               AddDashesToOption = true,
+                               AdditionalNewLineAfterOption = true
+                           };
+
+            help.AddOptions(this, "[Required]");
+            ParseErrors(help);
+
+            return help;
+        }
+
+        public virtual void ParseErrors(HelpText help)
+        {
+            if (State.Errors.Count > 0)
+            {
+                var errors = help.RenderParsingErrorsText(this, 2);
+                if (!string.IsNullOrEmpty(errors))
+                {
+                    help.AddPreOptionsLine(string.Concat(Environment.NewLine, "Error details:", Environment.NewLine));
+                    help.AddPreOptionsLine(errors);
+                }
+            }
+        }
+
+        public virtual HelpText GetUsage()
+        {
+            var text = GetHelpTextBuilder();
 
             var copyright = new StringBuilder();
             if (helpOptionFlags.HasFlag(HelpOptionFlag.Copyright))
@@ -170,9 +201,40 @@ namespace ConsoleUtils
             return text;
         }
 
-        public virtual string GetUsage()
+        public class DefaultSentenceBuilder : EnglishSentenceBuilder
         {
-            return GetHelpText();
+            /// <summary>
+            ///     Gets a string containing the sentence for missing required option in English.
+            /// </summary>
+            public override string RequiredOptionMissingText
+            {
+                get
+                {
+                    return " - Required option missing";
+                }
+            }
+
+            /// <summary>
+            ///     Gets a string containing the sentence for format violation in English.
+            /// </summary>
+            public override string ViolatesFormatText
+            {
+                get
+                {
+                    return " - Invalid format";
+                }
+            }
+
+            /// <summary>
+            ///     Gets a string containing the sentence for mutual exclusiveness violation in English.
+            /// </summary>
+            public override string ViolatesMutualExclusivenessText
+            {
+                get
+                {
+                    return " - Exclusive option. Only one exclusive option from a group may be used";
+                }
+            }
         }
     }
 }
