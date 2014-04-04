@@ -135,6 +135,7 @@ namespace ConsoleUtils
 
         public virtual void ParseErrors(HelpText help)
         {
+            if (State != null && State.Errors != null)
             if (State.Errors.Count > 0)
             {
                 var errors = help.RenderParsingErrorsText(this, 2);

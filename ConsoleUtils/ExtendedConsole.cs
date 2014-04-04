@@ -16,6 +16,8 @@ namespace ConsoleUtils
         public static ConsoleColor SuccessColor = ConsoleColor.Green;
         public static ConsoleColor InfoColor = ConsoleColor.DarkGray;
 
+        private static object syncRoot = new object();
+
         public static void ColoredAction(ConsoleColor textColor, Action action)
         {
             ColoredAction(textColor, Console.BackgroundColor, action);
@@ -23,13 +25,16 @@ namespace ConsoleUtils
 
         public static void ColoredAction(ConsoleColor textColor, ConsoleColor backgroundColor, Action action)
         {
-            var currentFgColor = Console.ForegroundColor;
-            var currentBgColor = Console.BackgroundColor;
-            Console.ForegroundColor = textColor;
-            Console.BackgroundColor = backgroundColor;
-            action();
-            Console.ForegroundColor = currentFgColor;
-            Console.BackgroundColor = currentBgColor;
+            lock (syncRoot)
+            {
+                var currentFgColor = Console.ForegroundColor;
+                var currentBgColor = Console.BackgroundColor;
+                Console.ForegroundColor = textColor;
+                Console.BackgroundColor = backgroundColor;
+                action();
+                Console.ForegroundColor = currentFgColor;
+                Console.BackgroundColor = currentBgColor;
+            }
         }
 
         public static void WriteErrorLine(object value)
@@ -139,15 +144,18 @@ namespace ConsoleUtils
             int rightSpacing = 1,
             bool ignoreRight = false)
         {
-            var innerLength = text.Length + leftSpacing + rightSpacing;
-            var fillerLength = (Console.WindowWidth - innerLength) / 2;
-            Console.Write(new string(fillerChar, fillerLength));
-            Console.Write(new string(' ', leftSpacing) + text + new string(' ', rightSpacing));
-
-            // Remove an extra filler to make sure the content is centralized regardless of even or odd length.
-            if (!ignoreRight)
+            lock (syncRoot)
             {
-                Console.Write(new string(fillerChar, innerLength % 2 == 0 ? fillerLength - 1 : fillerLength));
+                var innerLength = text.Length + leftSpacing + rightSpacing;
+                var fillerLength = (Console.WindowWidth - innerLength) / 2;
+                Console.Write(new string(fillerChar, fillerLength));
+                Console.Write(new string(' ', leftSpacing) + text + new string(' ', rightSpacing));
+
+                // Remove an extra filler to make sure the content is centralized regardless of even or odd length.
+                if (!ignoreRight)
+                {
+                    Console.Write(new string(fillerChar, innerLength % 2 == 0 ? fillerLength - 1 : fillerLength));
+                }
             }
         }
 
@@ -157,8 +165,11 @@ namespace ConsoleUtils
             int leftSpacing = 1,
             int rightSpacing = 1)
         {
-            WriteCentered(text, fillerChar, leftSpacing, rightSpacing);
-            Console.WriteLine();
+            lock (syncRoot)
+            {
+                WriteCentered(text, fillerChar, leftSpacing, rightSpacing);
+                Console.WriteLine();
+            }
         }
 
         public static void FillRow(char c)
