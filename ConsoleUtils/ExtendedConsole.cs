@@ -16,7 +16,7 @@ namespace ConsoleUtils
         public static ConsoleColor SuccessColor = ConsoleColor.Green;
         public static ConsoleColor InfoColor = ConsoleColor.DarkGray;
 
-        private static object syncRoot = new object();
+        private static readonly object syncRoot = new object();
 
         public static void ColoredAction(ConsoleColor textColor, Action action)
         {
@@ -142,7 +142,7 @@ namespace ConsoleUtils
             char fillerChar = ' ',
             int leftSpacing = 1,
             int rightSpacing = 1,
-            bool ignoreRight = false)
+            bool ignoreRight = false, Action onFinish = null)
         {
             lock (syncRoot)
             {
@@ -156,6 +156,7 @@ namespace ConsoleUtils
                 {
                     Console.Write(new string(fillerChar, innerLength % 2 == 0 ? fillerLength - 1 : fillerLength));
                 }
+                if (onFinish != null) onFinish();
             }
         }
 
@@ -165,11 +166,7 @@ namespace ConsoleUtils
             int leftSpacing = 1,
             int rightSpacing = 1)
         {
-            lock (syncRoot)
-            {
-                WriteCentered(text, fillerChar, leftSpacing, rightSpacing);
-                Console.WriteLine();
-            }
+                WriteCentered(text, fillerChar, leftSpacing, rightSpacing, onFinish: Console.WriteLine);
         }
 
         public static void FillRow(char c)
