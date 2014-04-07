@@ -16,7 +16,7 @@ namespace ConsoleUtils
         public static ConsoleColor SuccessColor = ConsoleColor.Green;
         public static ConsoleColor InfoColor = ConsoleColor.DarkGray;
 
-        private static readonly object syncRoot = new object();
+        private static readonly object SyncRoot = new object();
 
         public static void ColoredAction(ConsoleColor textColor, Action action)
         {
@@ -25,7 +25,7 @@ namespace ConsoleUtils
 
         public static void ColoredAction(ConsoleColor textColor, ConsoleColor backgroundColor, Action action)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 var currentFgColor = Console.ForegroundColor;
                 var currentBgColor = Console.BackgroundColor;
@@ -144,7 +144,7 @@ namespace ConsoleUtils
             int rightSpacing = 1,
             bool ignoreRight = false, Action onFinish = null)
         {
-            lock (syncRoot)
+            lock (SyncRoot)
             {
                 var innerLength = text.Length + leftSpacing + rightSpacing;
                 var fillerLength = (Console.WindowWidth - innerLength) / 2;
