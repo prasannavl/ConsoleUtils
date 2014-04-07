@@ -42,7 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArgumentSet.cs" />
+    <Compile Include="CommandLineOptions.cs" />
     <Compile Include="AssemblyMetaInfo.cs" />
     <Compile Include="ExtendedConsole.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

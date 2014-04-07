@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("ConsoleUtils")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Console application utilities.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Launchark")]
 [assembly: AssemblyProduct("ConsoleUtils")]
