@@ -16,8 +16,6 @@ namespace ConsoleUtils
         public static ConsoleColor SuccessColor = ConsoleColor.Green;
         public static ConsoleColor InfoColor = ConsoleColor.DarkGray;
 
-        private static readonly object SyncRoot = new object();
-
         public static void ColoredAction(ConsoleColor textColor, Action action)
         {
             ColoredAction(textColor, Console.BackgroundColor, action);
@@ -25,7 +23,7 @@ namespace ConsoleUtils
 
         public static void ColoredAction(ConsoleColor textColor, ConsoleColor backgroundColor, Action action)
         {
-            lock (SyncRoot)
+            lock (Console.Out)
             {
                 var currentFgColor = Console.ForegroundColor;
                 var currentBgColor = Console.BackgroundColor;
@@ -142,9 +140,10 @@ namespace ConsoleUtils
             char fillerChar = ' ',
             int leftSpacing = 1,
             int rightSpacing = 1,
-            bool ignoreRight = false, Action onFinish = null)
+            bool ignoreRight = false,
+            Action onFinish = null)
         {
-            lock (SyncRoot)
+            lock (Console.Out)
             {
                 var innerLength = text.Length + leftSpacing + rightSpacing;
                 var fillerLength = (Console.WindowWidth - innerLength) / 2;
@@ -156,7 +155,10 @@ namespace ConsoleUtils
                 {
                     Console.Write(new string(fillerChar, innerLength % 2 == 0 ? fillerLength - 1 : fillerLength));
                 }
-                if (onFinish != null) onFinish();
+                if (onFinish != null)
+                {
+                    onFinish();
+                }
             }
         }
 
@@ -166,7 +168,7 @@ namespace ConsoleUtils
             int leftSpacing = 1,
             int rightSpacing = 1)
         {
-                WriteCentered(text, fillerChar, leftSpacing, rightSpacing, onFinish: Console.WriteLine);
+            WriteCentered(text, fillerChar, leftSpacing, rightSpacing, onFinish: Console.WriteLine);
         }
 
         public static void FillRow(char c)
