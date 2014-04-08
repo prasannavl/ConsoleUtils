@@ -25,13 +25,22 @@ namespace ConsoleUtils
         {
             lock (Console.Out)
             {
-                var currentFgColor = Console.ForegroundColor;
                 var currentBgColor = Console.BackgroundColor;
+                var currentFgColor = Console.ForegroundColor;
+
+                var shouldReplaceBgColor = currentBgColor != backgroundColor;
+
                 Console.ForegroundColor = textColor;
-                Console.BackgroundColor = backgroundColor;
+                if (shouldReplaceBgColor)
+                {
+                    Console.BackgroundColor = backgroundColor;
+                }
                 action();
                 Console.ForegroundColor = currentFgColor;
-                Console.BackgroundColor = currentBgColor;
+                if (shouldReplaceBgColor)
+                {
+                    Console.BackgroundColor = currentBgColor;
+                }
             }
         }
 
