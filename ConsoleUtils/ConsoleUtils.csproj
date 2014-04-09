@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="CommandLineOptions.cs" />
     <Compile Include="AssemblyMetaInfo.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="ExtendedConsole.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
