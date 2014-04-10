@@ -16,6 +16,19 @@ namespace ConsoleUtils
         public static ConsoleColor SuccessColor = ConsoleColor.Green;
         public static ConsoleColor InfoColor = ConsoleColor.DarkGray;
 
+        private static ConsoleCancelEventHandler ConsoleResetHandler;
+
+        static ExtendedConsole()
+        {
+            ConsoleResetHandler = delegate { Console.ResetColor(); };
+            Console.CancelKeyPress += ConsoleResetHandler;
+        }
+
+        public static ConsoleCancelEventHandler GetConsoleResetHandler()
+        {
+            return ConsoleResetHandler;
+        }
+
         public static void ColoredAction(ConsoleColor textColor, Action action)
         {
             ColoredAction(textColor, Console.BackgroundColor, action);
