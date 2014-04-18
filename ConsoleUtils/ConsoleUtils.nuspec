@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
+
 <package>
-  <metadata>
-    <id>$id$</id>
-    <version>$version$</version>
-    <title>$title$</title>
-    <authors>$author$ , Prasanna V. Loganathar</authors>
-    <owners>$author$</owners>
-    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.txt</licenseUrl>
-    <projectUrl>https://github.com/launchark/ConsoleUtils</projectUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>$description$</description>
-    <releaseNotes>Add meta-info, code clean-up.</releaseNotes>
-    <copyright>Copyright 2014</copyright>
-    <tags>Console CommandLine Parser Utilities</tags>
-  </metadata>
+    <metadata>
+        <id>$id$</id>
+        <version>$version$</version>
+        <title>$title$</title>
+        <authors>$author$ , Prasanna V. Loganathar</authors>
+        <owners>$author$</owners>
+        <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.txt</licenseUrl>
+        <projectUrl>https://github.com/prasannavl/ConsoleUtils</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>$description$</description>
+        <copyright>Copyright 2014</copyright>
+        <tags>Console CommandLine Parser Utilities</tags>
+    </metadata>
 </package>

@@ -1,7 +1,19 @@
 ﻿// Author: Prasanna V. Loganathar
 // Project: ConsoleUtils
-// Copyright (c) Launchark. All rights reserved.
-// See License.txt in the project root for license information.
+// 
+// Copyright 2014 Launchark. All Rights Reserved.
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //  
 // Created: 9:21 PM 03-04-2014
 
@@ -16,18 +28,13 @@ namespace ConsoleUtils
         public static ConsoleColor SuccessColor = ConsoleColor.Green;
         public static ConsoleColor InfoColor = ConsoleColor.DarkGray;
 
-        private static ConsoleCancelEventHandler ConsoleResetHandler;
-
         static ExtendedConsole()
         {
             ConsoleResetHandler = delegate { Console.ResetColor(); };
             Console.CancelKeyPress += ConsoleResetHandler;
         }
 
-        public static ConsoleCancelEventHandler GetConsoleResetHandler()
-        {
-            return ConsoleResetHandler;
-        }
+        public static ConsoleCancelEventHandler ConsoleResetHandler { get; set; }
 
         public static void ColoredAction(ConsoleColor textColor, Action action)
         {
@@ -213,6 +220,35 @@ namespace ConsoleUtils
         public static void FillRemainingRow(char c)
         {
             Console.Write(new string(c, Console.WindowWidth - Console.CursorLeft - 1));
+        }
+
+        /// <summary>
+        ///     Set console buffer if possible based on the platform, and return if it was successfully set.
+        ///     <para>
+        ///         Note: Buffer size is set to the maximum value of Int16.MaxValue - 1, if its larger than that,
+        ///         and will still return true.
+        ///     </para>
+        /// </summary>
+        /// <param name="value">Buffer size</param>
+        /// <returns>True if the buffer was successfully set.</returns>
+        public static bool SetConsoleBuffer(int value)
+        {
+            try
+            {
+                var platform = Environment.OSVersion.Platform;
+                if (platform.HasFlag(PlatformID.Win32NT) || platform.HasFlag(PlatformID.Win32Windows)
+                    || platform.HasFlag(PlatformID.Win32S))
+                {
+                    Console.SetBufferSize(Console.BufferWidth, value >= Int16.MaxValue ? Int16.MaxValue - 1 : value);
+                    return true;
+                }
+            }
+            catch
+            {
+                // Any errors can be ignored.
+            }
+
+            return false;
         }
 
         public static void RepeatString(string text, int numberOfTimes, bool breakLines = false)

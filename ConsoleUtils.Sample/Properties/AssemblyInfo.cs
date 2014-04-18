@@ -1,5 +1,5 @@
 ﻿// Author: Prasanna V. Loganathar
-// Project: ConsoleUtils
+// Project: ConsoleUtils.Sample
 // 
 // Copyright 2014 Launchark. All Rights Reserved.
 // 
@@ -15,7 +15,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //  
-// Created: 9:21 PM 03-04-2014
+// Created: 12:43 AM 18-04-2014
 
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -24,11 +24,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("ConsoleUtils")]
-[assembly: AssemblyDescription("Console application helpers and utilities.")]
+[assembly: AssemblyTitle("ConsoleUtils.Sample")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Launchark")]
-[assembly: AssemblyProduct("ConsoleUtils")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("ConsoleUtils.Sample")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -41,7 +41,7 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 
-[assembly: Guid("9cc236ae-3211-4688-b863-34f991e13dfb")]
+[assembly: Guid("9d7c735e-9560-4cd5-94b4-9933ecb5528d")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -54,5 +54,5 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("1.1.0.0")]
+[assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
