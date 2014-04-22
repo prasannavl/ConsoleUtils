@@ -48,6 +48,8 @@ namespace ConsoleUtils
             Action<object> action,
             object actionState)
         {
+            // Locking on a weak object by design, to make sure strategy can co-ordinated externally, 
+            // from external assembly, and whenever writing to a console.
             lock (Console.Out)
             {
                 var currentBgColor = Console.BackgroundColor;
