@@ -20,6 +20,7 @@
 namespace ConsoleUtils
 {
     using System;
+    using System.Text;
 
     public static class ExtendedConsole
     {
@@ -36,12 +37,16 @@ namespace ConsoleUtils
 
         public static ConsoleCancelEventHandler ConsoleResetHandler { get; set; }
 
-        public static void ColoredAction(ConsoleColor textColor, Action action)
+        public static void DoColored(ConsoleColor textColor, Action<object> action, object actionState)
         {
-            ColoredAction(textColor, Console.BackgroundColor, action);
+            DoColored(textColor, Console.BackgroundColor, action, actionState);
         }
 
-        public static void ColoredAction(ConsoleColor textColor, ConsoleColor backgroundColor, Action action)
+        public static void DoColored(
+            ConsoleColor textColor,
+            ConsoleColor backgroundColor,
+            Action<object> action,
+            object actionState)
         {
             lock (Console.Out)
             {
@@ -55,7 +60,7 @@ namespace ConsoleUtils
                 {
                     Console.BackgroundColor = backgroundColor;
                 }
-                action();
+                action(actionState);
                 Console.ForegroundColor = currentFgColor;
                 if (shouldReplaceBgColor)
                 {
@@ -146,22 +151,22 @@ namespace ConsoleUtils
 
         public static void WriteLine(ConsoleColor textColor, object value)
         {
-            ColoredAction(textColor, () => Console.WriteLine(value));
+            DoColored(textColor, Console.WriteLine, value);
         }
 
         public static void Write(ConsoleColor textColor, string format, params object[] args)
         {
-            ColoredAction(textColor, () => Console.Write(format, args));
+            DoColored(textColor, Console.Write, string.Format(format, args));
         }
 
         public static void Write(ConsoleColor textColor, object value)
         {
-            ColoredAction(textColor, () => Console.Write(value));
+            DoColored(textColor, Console.Write, value);
         }
 
         public static void WriteLine(ConsoleColor textColor, string format, params object[] args)
         {
-            ColoredAction(textColor, () => Console.WriteLine(format, args));
+            DoColored(textColor, Console.WriteLine, string.Format(format, args));
         }
 
         public static void WriteCentered(
@@ -169,69 +174,75 @@ namespace ConsoleUtils
             char fillerChar = ' ',
             int leftSpacing = 1,
             int rightSpacing = 1,
-            bool ignoreRight = false,
-            Action onFinish = null)
+            bool ignoreRight = false)
         {
-            lock (Console.Out)
-            {
-                var innerLength = text.Length + leftSpacing + rightSpacing;
-                var fillerLength = (Console.WindowWidth - innerLength) / 2;
-                Console.Write(new string(fillerChar, fillerLength));
-                Console.Write(new string(' ', leftSpacing) + text + new string(' ', rightSpacing));
-
-                // Remove an extra filler to make sure the content is centralized regardless of even or odd length.
-                if (!ignoreRight)
-                {
-                    Console.Write(new string(fillerChar, innerLength % 2 == 0 ? fillerLength - 1 : fillerLength));
-                }
-                if (onFinish != null)
-                {
-                    onFinish();
-                }
-            }
+            Console.Write(GetCenteredString(text, fillerChar, leftSpacing, rightSpacing, ignoreRight));
         }
 
         public static void WriteLineCentered(
             string text,
             char fillerChar = ' ',
             int leftSpacing = 1,
-            int rightSpacing = 1)
+            int rightSpacing = 1,
+            bool ignoreRight = false)
         {
-            WriteCentered(text, fillerChar, leftSpacing, rightSpacing, onFinish: Console.WriteLine);
+            Console.WriteLine(GetCenteredString(text, fillerChar, leftSpacing, rightSpacing, ignoreRight));
         }
 
-        public static void FillRow(char c)
+        public static StringBuilder GetCenteredString(
+            string text,
+            char fillerChar = ' ',
+            int leftSpacing = 1,
+            int rightSpacing = 1,
+            bool ignoreRight = false)
         {
-            Console.Write(new string(c, Console.WindowWidth - 1));
+            var sb = new StringBuilder(Console.WindowWidth);
+
+            var innerLength = text.Length + leftSpacing + rightSpacing;
+            var fillerLength = (Console.WindowWidth - innerLength) / 2;
+            sb.Append(new string(fillerChar, fillerLength));
+            sb.Append(new string(' ', leftSpacing) + text + new string(' ', rightSpacing));
+
+            // Remove an extra filler to make sure the content is centralized regardless of even or odd length.
+            if (!ignoreRight)
+            {
+                sb.Append(new string(fillerChar, innerLength % 2 == 0 ? fillerLength - 1 : fillerLength));
+            }
+
+            return sb;
+        }
+
+        public static void FillRow(char c, string addendum = null)
+        {
+            Console.Write(new string(c, Console.WindowWidth - 1) + addendum);
         }
 
         public static void FillLine(char c)
         {
-            FillRow(c);
-            Console.WriteLine();
+            FillRow(c, Environment.NewLine);
         }
 
         public static void FillRemainingLine(char c)
         {
-            FillRemainingRow(c);
-            Console.WriteLine();
+            FillRemainingRow(c, Environment.NewLine);
         }
 
-        public static void FillRemainingRow(char c)
+        public static void FillRemainingRow(char c, string addendum = null)
         {
-            Console.Write(new string(c, Console.WindowWidth - Console.CursorLeft - 1));
+            Console.Write(new string(c, Console.WindowWidth - Console.CursorLeft - 1) + addendum);
         }
 
         /// <summary>
-        ///     Set console buffer if possible based on the platform, and return if it was successfully set.
+        ///     Set console buffer if possible based on the platform, and return true if it was successfully set.
         ///     <para>
         ///         Note: Buffer size is set to the maximum value of Int16.MaxValue - 1, if its larger than that,
         ///         and will still return true.
         ///     </para>
         /// </summary>
-        /// <param name="value">Buffer size</param>
+        /// <param name="width">Buffer width. A value of -1 leaves it unchanged.</param>
+        /// <param name="height">Buffer height. A value of -1 leaves it unchanged.</param>
         /// <returns>True if the buffer was successfully set.</returns>
-        public static bool SetConsoleBuffer(int value)
+        public static bool SetBufferSize(int width = -1, int height = -1)
         {
             try
             {
@@ -239,7 +250,26 @@ namespace ConsoleUtils
                 if (platform.HasFlag(PlatformID.Win32NT) || platform.HasFlag(PlatformID.Win32Windows)
                     || platform.HasFlag(PlatformID.Win32S))
                 {
-                    Console.SetBufferSize(Console.BufferWidth, value >= Int16.MaxValue ? Int16.MaxValue - 1 : value);
+                    const int Max = Int16.MaxValue - 1;
+
+                    if (height < 0)
+                    {
+                        height = Console.BufferHeight;
+                    }
+                    else if (height > Max)
+                    {
+                        height = Max;
+                    }
+                    if (width < 0)
+                    {
+                        width = Console.BufferWidth;
+                    }
+                    else if (width > Max)
+                    {
+                        width = Max;
+                    }
+
+                    Console.SetBufferSize(width, height);
                     return true;
                 }
             }
@@ -249,18 +279,6 @@ namespace ConsoleUtils
             }
 
             return false;
-        }
-
-        public static void RepeatString(string text, int numberOfTimes, bool breakLines = false)
-        {
-            for (int i = 0; i < numberOfTimes; i++)
-            {
-                Console.Write(text);
-                if (breakLines)
-                {
-                    Console.WriteLine();
-                }
-            }
         }
     }
 }

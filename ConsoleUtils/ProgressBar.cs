@@ -27,7 +27,7 @@ namespace ConsoleUtils
 
     public class ProgressBar
     {
-        public delegate StringBuilder ProgressBarHook(StringBuilder builder, double value);
+        public delegate StringBuilder ProgressBarHook(ProgressBar self, StringBuilder builder, double value);
 
         private string leftDiscriminator = "[";
         private string rightDiscriminator = "]";
@@ -146,11 +146,11 @@ namespace ConsoleUtils
 
             if (builder == null)
             {
-                builder = new StringBuilder(Console.BufferWidth);
+                builder = new StringBuilder(Console.WindowWidth);
             }
             if (ProgressBarPreHooks != null)
             {
-                builder = ProgressBarPreHooks(builder, ratio);
+                builder = ProgressBarPreHooks(this, builder, ratio);
             }
             if (progressWidth > 0)
             {
@@ -158,7 +158,7 @@ namespace ConsoleUtils
             }
             if (ProgressBarPostHooks != null)
             {
-                builder = ProgressBarPostHooks(builder, ratio);
+                builder = ProgressBarPostHooks(this, builder, ratio);
             }
             return builder;
         }
@@ -210,7 +210,7 @@ namespace ConsoleUtils
             }
 
             var tempBuilder = new StringBuilder();
-            tempBuilder = hook(tempBuilder, 0);
+            tempBuilder = hook(this, tempBuilder, 0);
             Debug.WriteLine("Hook length: " + tempBuilder.Length);
             return tempBuilder.Length;
         }
@@ -249,20 +249,20 @@ namespace ConsoleUtils
         private int progressBarLength;
 
         public FixedWidthInfomativeProgressBar(double totalCount, int width = -1)
-            : base(width < 0 ? Console.BufferWidth - 1 : width)
+            : base(width < 0 ? Console.WindowWidth - 1 : width)
         {
             TotalCount = totalCount;
 
-            ProgressBarPreHooks += (b, v) =>
+            ProgressBarPreHooks += (self, b, v) =>
                 {
                     var bx = b.Append(' ');
-                    bx = BuildCountInfo(bx, v);
+                    bx = ((FixedWidthInfomativeProgressBar)self).BuildCountInfo(bx, v);
                     return bx.Append(' ');
                 };
 
-            ProgressBarPostHooks += (b, v) =>
+            ProgressBarPostHooks += (self, b, v) =>
                 {
-                    var bx = BuildPercentDisplay(b, v);
+                    var bx = self.BuildPercentDisplay(b, v);
                     return bx.Append(' ');
                 };
         }
@@ -319,7 +319,7 @@ namespace ConsoleUtils
             }
             if (builder == null)
             {
-                builder = new StringBuilder(Console.BufferWidth);
+                builder = new StringBuilder(Console.WindowWidth);
             }
             var progressRatio = count / TotalCount;
             return Build(progressRatio, progressBarLength, builder);

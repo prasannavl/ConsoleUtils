@@ -26,31 +26,26 @@ namespace ConsoleUtils.Sample
     {
         private static void Main(string[] args)
         {
-            var progressBar = new FixedWidthInfomativeProgressBar(120);
-            var t = Task.Run(
-                () =>
-                    {
-                        for (int i = 0; i < 120; i++)
-                        {
-                            progressBar.UpdateProgress(i + 1);
-                            Task.Delay(50).Wait();
-                        }
-                    });
+            var pb = new FixedWidthProgressBar(40);
 
-            t.Wait();
-
-            var pb = new FixedWidthProgressBar(90);
-            t = Task.Run(
-                () =>
-                    {
-                        for (int i = 0; i <= 120; i++)
-                        {
-                            pb.UpdateProgress((double)i / 120);
-                            Task.Delay(50).Wait();
-                        }
-                    });
+            for (int i = 0; i <= 120; i++)
+            {
+                pb.UpdateProgress((double)i / 120);
+                Task.Delay(50).Wait();
+            }
 
             Console.WriteLine();
+
+            var progressBar = new FixedWidthInfomativeProgressBar(120);
+
+            for (int i = 0; i < 120; i++)
+            {
+                progressBar.UpdateProgress(i + 1);
+                Task.Delay(50).Wait();
+            }
+
+            Console.WriteLine();
+
             Console.ReadLine();
         }
     }
