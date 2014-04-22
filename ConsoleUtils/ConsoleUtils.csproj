@@ -40,8 +40,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="TextUtils">
-      <HintPath>..\packages\TextUtils.1.0.0.0\lib\portable-net45+sl50+wp80+win\TextUtils.dll</HintPath>
+    <Reference Include="TextUtils, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\TextUtils.1.0.3.0\lib\portable-net45+sl50+wp80+win+MonoAndroid10+MonoTouch10\TextUtils.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

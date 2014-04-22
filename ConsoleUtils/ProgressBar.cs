@@ -23,7 +23,7 @@ namespace ConsoleUtils
     using System.Diagnostics;
     using System.Text;
 
-    using TextUtils;
+    using TextUtils.Extensions;
 
     public class ProgressBar
     {
