@@ -9,4 +9,4 @@ Console application tools with numerous helpers.
 
 Sample usage of the progress bars are in the Sample.
 
-An example of the command-line parsing can been seen in the Wrex.Console project, at https://github.com/launchark/Wrex/blob/master/Wrex.Console/CmdOptions.cs and https://github.com/launchark/Wrex/blob/master/Wrex.Console/Program.cs
+An example of the command-line parsing can been seen in the Wrex.Console project, at https://github.com/prasannavl/Wrex/blob/master/Wrex.Console/CmdOptions.cs and https://github.com/prasannavl/Wrex/blob/master/Wrex.Console/Program.cs
